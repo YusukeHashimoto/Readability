@@ -1,9 +1,10 @@
+import static raykernel.apps.readability.eval.Main.getReadability;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import static raykernel.apps.readability.eval.Main.getReadability;
+import java.util.Map;
 
 public class Main {
 	public static void main(String args[]) {
@@ -11,12 +12,14 @@ public class Main {
 		if(code == null) return;
 		
 		double score = getReadability(code);
-		System.out.println(score);
+		System.out.println(score + "\n");
 		
 		Program program = new Program(code);
-		for(String s : program.getMethodList()) {
-			double scoreOfMethod = getReadability(s);
-			System.out.println(scoreOfMethod);
+		
+		Map<String, String> methodMap = program.getMethodMap();
+		for(String methodName : methodMap.keySet()) {
+			double scoreOfMethod = getReadability(methodMap.get(methodName));
+			System.out.println(methodName + " : " + scoreOfMethod);
 		}
 	}
 
