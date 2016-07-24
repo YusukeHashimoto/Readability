@@ -1,14 +1,15 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Program {
 	private String code;
 	private Map<String, String> methodMap;
+	private List<String> words;
 	
 	Program(String code) {
 		this.code = code;
 		methodMap = new HashMap<String, String>();
 		splitIntoMethods();
+		splitIntoWords();
 	}
 	
 	private void splitIntoMethods() {
@@ -56,6 +57,49 @@ public class Program {
 		return code;
 	}
 	
+	private void splitIntoWords() {
+		words = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < code.length(); i++) {
+			char c = code.charAt(i);
+			if(c == ' ' || c == '\t' || c == '{' || c == '}'
+					|| c == '(' || c == ')' || c == '\n' || c == '.' || c == ';') {
+				if(sb.length() > 0) {
+					words.add(sb.toString());
+					sb = new StringBuilder();
+				}
+				continue;
+			} else {
+				sb.append(c);
+			}
+		}
+	}
+	
+	double averageWordLength() {
+		double sum = 0;
+		for(String word : words) {
+			sum += word.length();
+		}
+		return sum / words.size();
+	}
+	
+	double averageSentenceLength() {
+		return (double)words.size() / numberOfSentences();
+	}
+	
+	private int numberOfSentences() {
+		int n = 0;
+		for(int i = 0; i < code.length(); i++) {
+			char c = code.charAt(i);
+			if(c == '{' || c == ';') n++;
+		}
+		return n;
+	}
+	
+	double calcSRES() {
+		return averageSentenceLength() - 0.1 * averageWordLength();
+	}
+	
 	public static void main(String args[]) {
 		String code = Main.readFile("./src/Program.java");
 		Program program = new Program(code);
@@ -64,5 +108,10 @@ public class Program {
 			System.out.println("-----------------------------------------------------------------------------");
 			System.out.println(program.getMethodMap().get(key));
 		}
+		
+		for(String s : program.words) {
+			System.out.println(s);
+		}
+		System.out.println(program.calcSRES());
 	}
 }
