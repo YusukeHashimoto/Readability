@@ -23,23 +23,28 @@ public class Program {
 		for(int i = 0, openedCurlyBracket = 0; i < code.length(); i++) {
 			switch(code.charAt(i)) {
 			case '{':
+				if(isSurroundedBySingleQuotation(code, i)) {
+					sb.append('{');
+					continue;
+				}
+
 				openedCurlyBracket++;
 				if(openedCurlyBracket == 2) { // beginning of method
-					sb = new StringBuilder();
 					if(code.charAt(i + 1) == '\n')
-						i++;
-					StringBuilder name = new StringBuilder();
-					for(int j = i - 2;; j--) {
-						if(name.toString().contains("(") && isSeparator(code.charAt(j)))
-							break;
-						name.append(code.charAt(j));
-					}
-					methodName = name.reverse().toString();
+						i++; // skip newline after open bracket
+
+					methodName = extractMethodName(sb);
+					sb = new StringBuilder();
 					continue;
 				}
 				break;
 
 			case '}':
+				if(isSurroundedBySingleQuotation(code, i)) {
+					sb.append('}');
+					continue;
+				}
+
 				openedCurlyBracket--;
 				if(openedCurlyBracket == 1) { // end of method
 					methodMap.put(methodName, sb.toString());
@@ -50,6 +55,10 @@ public class Program {
 
 			sb.append(code.charAt(i));
 		}
+	}
+
+	private boolean isSurroundedBySingleQuotation(String s, int index) {
+		return s.charAt(index - 1) == '\'' && s.charAt(index + 1) == '\'';
 	}
 
 	Map<String, String> getMethodMap() {
@@ -65,7 +74,7 @@ public class Program {
 		StringBuilder sb = new StringBuilder();
 		for(int i = 0; i < code.length(); i++) {
 			char c = code.charAt(i);
-			if(isSeparator(c) || isBracket(c) || c == '.' || c == ';') {
+			if(CharUtil.isSeparator(c) || CharUtil.isBracket(c) || c == '.' || c == ';') {
 				if(sb.length() > 0) {
 					words.add(sb.toString());
 					sb = new StringBuilder();
@@ -103,12 +112,17 @@ public class Program {
 		return averageSentenceLength() - 0.1 * averageWordLength();
 	}
 
-	static boolean isSeparator(char c) {
-		return c == ' ' || c == '\t' || c == '\n';
-	}
+	private static String extractMethodName(StringBuilder sb) {
+		StringBuilder name = new StringBuilder();
+		for(int i = sb.length() - 1; !(name.toString().contains("(") && CharUtil.isSeparator(sb.charAt(i))); i--) {
+			name.append(sb.charAt(i));
+		}
 
-	static boolean isBracket(char c) {
-		return c == '(' || c == ')' || c == '{' || c == '}';
+		if(CharUtil.isSeparator(name.charAt(0))) {
+			name.deleteCharAt(0);
+		}
+
+		return name.reverse().toString();
 	}
 
 	public static void main(String args[]) {
@@ -121,8 +135,9 @@ public class Program {
 		}
 
 		for(String s : program.words) {
-			System.out.println(s);
+			// System.out.println(s);
 		}
+
 		System.out.println(program.calcSRES());
 	}
 }
