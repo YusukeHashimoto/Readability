@@ -1,3 +1,4 @@
+package readability;
 
 public class CharUtil {
 	static boolean isSeparator(char c) {

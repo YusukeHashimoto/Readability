@@ -1,3 +1,4 @@
+package readability;
 import static raykernel.apps.readability.eval.Main.getReadability;
 
 import java.io.BufferedReader;
