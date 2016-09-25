@@ -1,16 +1,15 @@
 package readability;
-import static raykernel.apps.readability.eval.Main.getReadability;
+import static raykernel.apps.readability.eval.Main.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 
 public class Main {
 	public static void main(String args[]) {
-		String code = readFile("./src/Program.java");
+		String code = readFile("./src/readability/Program.java");
 		if(code == null) return;
+		
+		System.out.println("Readability by Buse & Weimer");
 		
 		double score = getReadability(code);
 		System.out.println(score + "\n");
@@ -21,6 +20,12 @@ public class Main {
 		for(String methodName : methodMap.keySet()) {
 			double scoreOfMethod = getReadability(methodMap.get(methodName));
 			System.out.println(methodName + " : " + scoreOfMethod);
+		}
+		
+		System.out.println("\nCyclomatic Complexity");
+		
+		for(String methodName : methodMap.keySet()) {
+			System.out.println(methodName + ": " + program.cyclomaticComplexityOf(methodName));
 		}
 	}
 

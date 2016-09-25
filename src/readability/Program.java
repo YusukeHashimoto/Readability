@@ -1,8 +1,5 @@
 package readability;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Program {
 	private String code;
@@ -11,10 +8,9 @@ public class Program {
 
 	Program(String code) {
 		this.code = code;
-		methodMap = new HashMap<String, String>();
-		words = new ArrayList<String>();
+		methodMap = new TreeMap<String, String>();
 		splitIntoMethods();
-		splitIntoWords();
+		words = splitIntoWords(code);
 	}
 
 	private void splitIntoMethods() {
@@ -71,8 +67,9 @@ public class Program {
 		return code;
 	}
 
-	private void splitIntoWords() {
+	private static List<String> splitIntoWords(String code) {
 		StringBuilder sb = new StringBuilder();
+		List<String> words = new ArrayList<String>();
 		for(int i = 0; i < code.length(); i++) {
 			char c = code.charAt(i);
 			if(CharUtil.isSeparator(c) || CharUtil.isBracket(c) || c == '.' || c == ';') {
@@ -85,6 +82,7 @@ public class Program {
 				sb.append(c);
 			}
 		}
+		return words;
 	}
 
 	double averageWordLength() {
@@ -140,5 +138,17 @@ public class Program {
 		}
 
 		System.out.println(program.calcSRES());
+	}
+	
+	public int cyclomaticComplexityOf(String methodName) {
+		int cc = 1;
+		for(String token : splitIntoWords(methodMap.get(methodName))) {
+			switch(token) {
+			case "if": case "while": case "case": case "for":
+			case "&&": case "||": case "catch":
+				cc++;
+			}
+		}
+		return cc;
 	}
 }
